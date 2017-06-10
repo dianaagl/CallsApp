@@ -34,20 +34,43 @@ public class CallsActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        checkCallLogPermission();
+       super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Log.e(TAG,"perm req code="+ requestCode);
+        switch (requestCode) {
+            case PERMISSION_REQUEST_CODE: {
+
+
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    getSupportLoaderManager().initLoader(LOADER_ID, null,
+                            new CallsLoaderCallbacks());
+                }
+
+                return;
+            }
+
+        }
+
     }
 
     private void checkCallLogPermission() {
-        int permissionResult = ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.READ_CALL_LOG);
-        if (permissionResult == PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(CallsActivity.this,
+                Manifest.permission.READ_CALL_LOG)
+                != PackageManager.PERMISSION_GRANTED) {
+
+
+                Log.e(TAG,"request");
+                ActivityCompat.requestPermissions(CallsActivity.this,
+                        new String[] {Manifest.permission.READ_CALL_LOG},
+                        PERMISSION_REQUEST_CODE);
+
+             
+
+        }
+        else {
             getSupportLoaderManager().initLoader(LOADER_ID, null,
                     new CallsLoaderCallbacks());
-        } else {
-            ActivityCompat.requestPermissions(this,
-                    new String[] {Manifest.permission.READ_CALL_LOG},
-                    PERMISSION_REQUEST_CODE);
         }
     }
 
